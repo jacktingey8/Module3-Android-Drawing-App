@@ -1,3 +1,11 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Drawing App</string>
+    <string name="color">Color</string>
+    <string name="size">Size: </string>
+    <string name="save">Save</string>
+    <string name="gallery">Gallery</string>
+    <string name="clear">Clear</string>
+    <string name="pick_a_color">Pick a color</string>
+    <string name="saved_to_gallery">Saved to Gallery</string>
+    <string name="failed_to_save">Failed to save: </string>
 </resources>
