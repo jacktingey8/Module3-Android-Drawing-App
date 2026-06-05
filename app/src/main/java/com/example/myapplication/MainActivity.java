@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -53,23 +55,60 @@ public class MainActivity extends AppCompatActivity {
 
         btnSave.setOnClickListener(v -> saveDrawing());
 
-        btnGallery.setOnClickListener(v -> {
-            Intent intent = new Intent(this, GalleryActivity.class);
-            startActivity(intent);
-        });
+        btnGallery.setOnClickListener(v -> checkPermissionAndOpenGallery());
+    }
+
+    private void checkPermissionAndOpenGallery() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.READ_MEDIA_IMAGES}, 101);
+            } else {
+                openGallery();
+            }
+        } else {
+            if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 101);
+            } else {
+                openGallery();
+            }
+        }
+    }
+
+    private void openGallery() {
+        Intent intent = new Intent(this, GalleryActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (requestCode == 100) {
+                saveDrawing();
+            } else if (requestCode == 101) {
+                openGallery();
+            }
+        } else {
+            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void showColorPickerDialog() {
         String[] colorNames = {"Black", "Red", "Green", "Blue", "Yellow", "Cyan", "Magenta"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.pick_a_color);
-        builder.setItems(colorNames, (dialog, which) -> {
-            drawingView.setPaintColor(colors[which]);
-        });
+        builder.setItems(colorNames, (dialog, which) -> drawingView.setPaintColor(colors[which]));
         builder.show();
     }
 
     private void saveDrawing() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
+                return;
+            }
+        }
+
         Bitmap bitmap = drawingView.getBitmap();
         String fileName = "drawing_" + System.currentTimeMillis() + ".png";
 

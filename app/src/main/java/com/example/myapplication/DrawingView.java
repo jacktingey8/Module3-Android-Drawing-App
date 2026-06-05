@@ -20,7 +20,7 @@ public class DrawingView extends View {
     private int paintColor = Color.BLACK;
     private float strokeWidth = 10f;
 
-    private List<FingerPath> paths = new ArrayList<>();
+    private final List<FingerPath> paths = new ArrayList<>();
 
     public DrawingView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -39,7 +39,7 @@ public class DrawingView extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@androidx.annotation.NonNull Canvas canvas) {
         for (FingerPath fp : paths) {
             drawPaint.setColor(fp.color);
             drawPaint.setStrokeWidth(fp.strokeWidth);
@@ -65,12 +65,18 @@ public class DrawingView extends View {
             case MotionEvent.ACTION_UP:
                 paths.add(new FingerPath(paintColor, strokeWidth, drawPath));
                 drawPath = new Path();
+                performClick();
                 break;
             default:
                 return false;
         }
         invalidate();
         return true;
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 
     public void setPaintColor(int color) {

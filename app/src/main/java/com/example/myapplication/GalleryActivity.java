@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,11 +28,23 @@ public class GalleryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        findViewById(R.id.btn_back).setOnClickListener(v -> finish());
+
         recyclerView = findViewById(R.id.recycler_view_gallery);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
         adapter = new GalleryAdapter(loadImages());
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 
     private List<Uri> loadImages() {
@@ -81,7 +94,13 @@ public class GalleryActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            holder.imageView.setImageURI(images.get(position));
+            Uri imageUri = images.get(position);
+            holder.imageView.setImageURI(imageUri);
+            holder.itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(v.getContext(), FullScreenImageActivity.class);
+                intent.putExtra("image_uri", imageUri.toString());
+                v.getContext().startActivity(intent);
+            });
         }
 
         @Override

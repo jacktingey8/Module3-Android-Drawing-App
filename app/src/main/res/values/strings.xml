@@ -8,4 +8,6 @@
     <string name="pick_a_color">Pick a color</string>
     <string name="saved_to_gallery">Saved to Gallery</string>
     <string name="failed_to_save">Failed to save: </string>
+    <string name="back">Back</string>
+    <string name="full_screen_image">Full screen image</string>
 </resources>
